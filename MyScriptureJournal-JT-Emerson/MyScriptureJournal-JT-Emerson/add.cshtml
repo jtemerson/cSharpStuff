@@ -1,0 +1,70 @@
+﻿@{
+    Validation.RequireField("book", "Book is Required!");
+    Validation.RequireField("chapter", "Chapter is required!");
+    Validation.RequireField("verse", "Verse is required!");
+    Validation.RequireField("note", "Note is required!");
+
+    var book = "";
+    var chapter = 0;
+    var verse = 0;
+    var note = "";
+    var date = "";
+
+
+
+    if (IsPost)
+    {
+        if (!Request.Form["chapter"].IsInt())
+        {
+            Validation.AddFormError("Chapter needs to be a number.");
+        }
+
+        if (!Request.Form["verse"].IsInt())
+        {
+            Validation.AddFormError("Verse needs to be a number.");
+        }
+
+        if (Validation.IsValid())
+        {
+            book = Request.Form["book"];
+            chapter = Request.Form["chapter"].AsInt();
+            verse = Request.Form["verse"].AsInt();
+            note = Request.Form["note"];
+
+            var db = Database.Open("WebPagesScriptures");
+            var insertCommand = "INSERT INTO Scriptures (book, chapter, verse, note, date) VALUES(@0, @1, @2, @3, @4)";
+            db.Execute(insertCommand, book, chapter, verse, note, date);
+
+            Response.Redirect("~/Scriptures");
+        }
+    }
+}
+<h2>Add a Scripture Note</h2>
+@Html.ValidationSummary()
+<form method="post">
+        <p>
+            <label for="book">Book:</label>
+            <input type="text" name="book" id="book" value="@Request.Form["book"]" />
+        </p>
+
+        <p>
+            <label for="chapter">Chapter:</label>
+            <input type="text" name="chapter" id="chapter" value="@Request.Form["chapter"]" />
+        </p>
+
+        <p>
+            <label for="verse">Verse:</label>
+            <input type="text" name="verse" id="verse" value="@Request.Form["verse"]" />
+        </p>
+
+        <p>
+            <label for="note">Note:</label>
+            <textarea rows="3" cols="28" id="note" name="note">@Request.Form["note"]</textarea>
+        </p>
+
+        <p><input type="submit" name="buttonSubmit" value="Add Entry" /></p>
+</form>
+
+<p>
+    <a href="~/Scriptures.cshtml">Back to Scriptures</a>
+</p>

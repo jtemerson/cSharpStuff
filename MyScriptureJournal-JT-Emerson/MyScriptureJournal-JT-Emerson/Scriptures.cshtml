@@ -1,0 +1,64 @@
+﻿@{
+    var db = Database.Open("WebPagesScriptures");
+    var selectCommand = "SELECT * FROM Scriptures";
+    var searchTerm = "";
+
+    if (Request.QueryString["bookSearch"] == "Search")
+    {
+        selectCommand = "SELECT * FROM Scriptures WHERE book LIKE @0";
+        searchTerm = "%" + Request.QueryString["searchBook"] + "%";
+    }
+
+    if (Request.QueryString["keywordSearch"] == "Search")
+    {
+        selectCommand = "SELECT * FROM Scriptures WHERE (book LIKE @0 OR chapter LIKE @0 OR verse LIKE @0 OR note LIKE @0 OR date LIKE @0)";
+        searchTerm = "%" + Request["searchKeyword"] + "%";
+    }
+
+    var selectedData = db.Query(selectCommand, searchTerm);
+    var grid = new WebGrid(source: selectedData, defaultSort: "Date", rowsPerPage: 5);
+    //grid.SortDirection = SortDirection.Descending;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scripture Journal</title>
+</head>
+<body>
+    <h2>Scriptures</h2>
+    <form method="get" id="search">
+        <div>
+            <label for="searchBook">Search by Book:</label>
+            <input type="text" name="searchBook" id="searchBook" value="@if(Request["keywordSearch"].IsEmpty()) {@Request.QueryString["searchBook"]}">
+            <input type="Submit" name="bookSearch" value="Search">
+        </div>
+        <span>or</span>
+        <div>
+            <label for="searchKeyword">Search by Keyword:</label>
+            <input type="text" name="searchKeyword" id="searchKeyword" value="@if(Request["bookSearch"].IsEmpty()) {@Request.QueryString["searchKeyword"]}">
+            <input type="Submit" name="keywordSearch" value="Search"><br>
+        </div>
+    </form>
+
+    @grid.GetHtml(
+                    tableStyle: "grid",
+                    headerStyle: "head",
+                    alternatingRowStyle: "alt",
+                    columns: grid.Columns(
+                        grid.Column(format: @<a href="~/edit?id=@item.ID">Edit</a>),
+                                                grid.Column("Book", canSort: true),
+                                                grid.Column("Chapter", canSort: false),
+                                                grid.Column("Verse", canSort: false),
+                                                grid.Column("Note", canSort: false),
+                                                grid.Column("Date", canSort: true),
+                                                grid.Column(format: @<a href="~/delete?id=@item.ID">Delete</a>)
+                                                                    )
+                                                            )
+
+    <br>
+    <p>
+        <a href="~/add">Add a Scripture Note</a>
+    </p>
+</body>
+</html>

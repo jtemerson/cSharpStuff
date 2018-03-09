@@ -1,0 +1,73 @@
+﻿@{
+    var book = "";
+    var chapter = 0;
+    var verse = 0;
+    var note = "";
+    var entryId = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty() && Request.QueryString["ID"].IsInt())
+        {
+            entryId = Request.QueryString["ID"];
+            var db = Database.Open("WebPagesScriptures");
+            var dbCommand = "SELECT * FROM Scriptures WHERE ID = @0";
+            var row = db.QuerySingle(dbCommand, entryId);
+            if (row != null)
+            {
+                book = row.book;
+                chapter = row.chapter;
+                verse = row.verse;
+                note = row.note;
+            }
+            else
+            {
+                Validation.AddFormError("ERROR");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("ERROR");
+        }
+    }
+
+    if (IsPost && !Request["buttonDelete"].IsEmpty())
+    {
+        entryId = Request.Form["entryId"];
+        var db = Database.Open("WebPagesScriptures");
+        var deleteCommand = "DELETE FROM Scriptures WHERE ID = @0";
+        db.Execute(deleteCommand, entryId);
+        Response.Redirect("~/Scriptures.cshtml");
+    }
+}
+
+<h2>Delete a Scripture Note</h2>
+@Html.ValidationSummary()
+<form method="post">
+
+        <p>
+            <span>Book:</span>
+            <span>@book</span>
+        </p>
+
+        <p>
+            <span>Chapter:</span>
+            <span>@chapter</span>
+        </p>
+
+        <p>
+            <span>Verse:</span>
+            <span>@verse</span>
+        </p>
+
+        <p>
+            <span>Note:</span>
+            <span>@note</span>
+        </p>
+
+        <input type="hidden" name="entryid" value="@entryId" />
+        <p><input type="submit" id="deleteButton" name="buttonDelete" value="Delete Entry" /></p>
+
+</form>
+<br>
+<p><a href="~/Scriptures.cshtml">Back to Scriptures</a></p>

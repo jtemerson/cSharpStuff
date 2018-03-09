@@ -1,0 +1,111 @@
+﻿@{
+    var book = "";
+    var chapter = 0;
+    var verse = 0;
+    var note = "";
+    var date = "" ;
+    var entryId = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty() && Request.QueryString["ID"].IsInt())
+        {
+            entryId = Request.QueryString["ID"];
+            var db = Database.Open("WebPagesScriptures");
+            var dbCommand = "SELECT * FROM Scriptures WHERE ID = @0";
+            var row = db.QuerySingle(dbCommand, entryId);
+            if (row != null)
+            {
+                book = row.book;
+                chapter = row.chapter;
+                verse = row.verse;
+                note = row.note;
+            }
+            else
+            {
+                Validation.AddFormError("No journal entry was found for that ID.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("No entry was selected.");
+        }
+    }
+
+    if (IsPost)
+    {
+        Validation.RequireField("book", "A book is required");
+        Validation.RequireField("chapter", "A chapter is required");
+        Validation.RequireField("verse", "A verse is required");
+        Validation.RequireField("note", "A note is required");
+        Validation.RequireField("entryid", "No journal entry ID was submitted!");
+
+        book = Request.Form["book"];
+        note = Request.Form["note"];
+        entryId = Request.Form["entryId"];
+
+        if (!Request.Form["chapter"].IsInt())
+        {
+            Validation.AddFormError("Chapter needs to be a number.");
+        }
+        else
+        {
+            chapter = Request.Form["chapter"].AsInt();
+            if (chapter <= 0)
+            {
+                Validation.AddFormError("Chapter needs to be a valid chapter number.");
+            }
+        }
+
+        if (!Request.Form["verse"].IsInt())
+        {
+            Validation.AddFormError("Verse needs to be a number.");
+        }
+        else
+        {
+            verse = Request.Form["verse"].AsInt();
+            if (verse <= 0)
+            {
+                Validation.AddFormError("Verse needs to be a valid verse number.");
+            }
+        }
+
+        if (Validation.IsValid())
+        {
+            var db = Database.Open("WebPagesScriptures");
+            var updateCommand = "UPDATE Scriptures SET book=@0, chapter=@1, verse=@2, note=@3, date=@4 WHERE Id=@5";
+            db.Execute(updateCommand, book, chapter, verse, note, date, entryId);
+            Response.Redirect("~/Scriptures");
+        }
+    }
+}
+
+<h2>Edit a Scripture Note</h2>
+@Html.ValidationSummary()
+<form method="post">
+
+        <p>
+            <label for="book">Book:</label>
+            <input type="text" name="book" id="book" value="@book" />
+        </p>
+
+        <p>
+            <label for="chapter">Chapter:</label>
+            <input type="text" name="chapter" id="chapter" value="@chapter" />
+        </p>
+
+        <p>
+            <label for="verse">Verse:</label>
+            <input type="text" name="verse" id="verse" value="@verse" />
+        </p>
+
+        <p>
+            <label for="note">Note:</label>
+            <textarea rows="3" cols="28" id="note" name="note">@note</textarea>
+        </p>
+
+        <input type="hidden" name="entryid" value="@entryId" />
+
+        <p><input type="submit" name="buttonSubmit" value="Submit Changes" /></p>
+</form>
+<p><a href="~/Scriptures.cshtml">Back to Scriptures</a></p>
