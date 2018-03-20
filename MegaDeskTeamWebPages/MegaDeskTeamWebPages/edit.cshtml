@@ -1,0 +1,122 @@
+﻿@{
+    var width = 0;
+    var depth = 0;
+    var numOfDrawers = 0;
+    var material = "";
+    var rushOrder = 0;
+    var customerName = "";
+    var date = "";
+    var total = 0;
+    var quoteId = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty() && Request.QueryString["ID"].IsInt())
+        {
+            quoteId = Request.QueryString["ID"];
+            var db = Database.Open("QuotesDatabase");
+            var dbCommand = "SELECT * FROM Quotes WHERE ID = @0";
+            var row = db.QuerySingle(dbCommand, quoteId);
+            if (row != null)
+            {
+                width = row.width;
+                depth = row.depth;
+                numOfDrawers = row.numOfDrawers;
+                material = row.material;
+                rushOrder = row.rushOrder;
+                customerName = row.customerName;
+                date = row.date;
+                total = row.total;
+            }
+            else
+            {
+                Validation.AddFormError("No quote entry was found for that ID.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("No quote was selected.");
+        }
+    }
+
+    if (IsPost)
+    {
+        Validation.RequireField("width", "Width is Required!");
+        Validation.RequireField("depth", "Depth is required!");
+        Validation.RequireField("numOfDrawers", "Number of Drawers is required!");
+        Validation.RequireField("material", "Material is required!");
+        Validation.RequireField("rushOrder", "Rush Order is required!");
+        Validation.RequireField("customerName", "Name is required!");
+        Validation.RequireField("date", "Date is required!");
+        Validation.RequireField("total", "Total is required!");
+        Validation.RequireField("quoteid", "No ID was submitted!");
+
+        width = Request.Form["width"].AsInt();
+        depth = Request.Form["depth"].AsInt();
+        numOfDrawers = Request.Form["numOfDrawers"].AsInt();
+        material = Request.Form["material"];
+        rushOrder = Request.Form["rushOrder"].AsInt();
+        customerName = Request.Form["customerName"];
+        date = Request.Form["date"];
+        total = Request.Form["total"].AsInt();
+        quoteId = Request.Form["quoteId"];
+
+        if (Validation.IsValid())
+        {
+            var db = Database.Open("QuotesDatabase");
+            var updateCommand = "UPDATE Quotes SET width=@0, depth=@1, numOfDrawers=@2, material=@3, rushOrder=@4, customerName=@5, date=@6, total=@7 WHERE Id=@8";
+            db.Execute(updateCommand, width, depth, numOfDrawers, material, rushOrder, customerName, date, total, quoteId);
+            Response.Redirect("~/Quotes");
+        }
+    }
+}
+
+<h2>Edit Quote</h2>
+@Html.ValidationSummary()
+<form method="post">
+
+    <p>
+        <label for="width">Width:</label>
+        <input type="text" name="width" id="width" value="@width" />
+    </p>
+
+    <p>
+        <label for="depth">Depth:</label>
+        <input type="text" name="depth" id="depth" value="@depth" />
+    </p>
+
+    <p>
+        <label for="numOfDrawers">Number of Drawers:</label>
+        <input type="text" name="numOfDrawers" id="numOfDrawers" value="@numOfDrawers" />
+    </p>
+
+    <p>
+        <label for="material">Material:</label>
+        <textarea rows="3" cols="28" id="material" name="material">@material</textarea>
+    </p>
+
+    <p>
+        <label for="rushOrder">Rush Order:</label>
+        <textarea rows="3" cols="28" id="rushOrder" name="rushOrder">@rushOrder</textarea>
+    </p>
+
+    <p>
+        <label for="customerName">Customer Name:</label>
+        <textarea rows="3" cols="28" id="customerName" name="customerName">@customerName</textarea>
+    </p>
+
+    <p>
+        <label for="date">Date:</label>
+        <textarea rows="3" cols="28" id="date" name="date">@date</textarea>
+    </p>
+
+    <p>
+        <label for="total">Total:</label>
+        <textarea rows="3" cols="28" id="total" name="total">@total</textarea>
+    </p>
+
+    <input type="hidden" name="quoteid" value="@quoteId" />
+
+    <p><input type="submit" name="buttonSubmit" value="Update Quote" /></p>
+</form>
+<p><a href="~/Quotes.cshtml">Back to Quotes</a></p>

@@ -1,0 +1,81 @@
+﻿@{
+    var width = 0;
+    var depth = 0;
+    var numOfDrawers = 0;
+    var material = "";
+    var rushOrder = 0;
+    var customerName = "";
+    var date = "";
+    var total = 0;
+    var quoteId = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty() && Request.QueryString["ID"].IsInt())
+        {
+            quoteId = Request.QueryString["ID"];
+            var db = Database.Open("QuotesDatabase");
+            var dbCommand = "SELECT * FROM Quotes WHERE ID = @0";
+            var row = db.QuerySingle(dbCommand, quoteId);
+            if (row != null)
+            {
+                width = row.width;
+                depth = row.depth;
+                numOfDrawers = row.numOfDrawers;
+                material = row.material;
+                rushOrder = row.rushOrder;
+                customerName = row.customerName;
+                date = row.date;
+                total = row.total;
+            }
+            else
+            {
+                Validation.AddFormError("ERROR");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("ERROR");
+        }
+    }
+
+    if (IsPost && !Request["buttonDelete"].IsEmpty())
+    {
+        quoteId = Request.Form["quoteId"];
+        var db = Database.Open("QuotesDatabase");
+        var deleteCommand = "DELETE FROM Quotes WHERE ID = @0";
+        db.Execute(deleteCommand, quoteId);
+        Response.Redirect("~/Quotes.cshtml");
+    }
+}
+
+<h2>Delete Quote</h2>
+@Html.ValidationSummary()
+<form method="post">
+
+    <p>
+        <span>Customer Name:</span>
+        <span>@customerName</span>
+    </p>
+
+    <p>
+        <span>Date:</span>
+        <span>@date</span>
+    </p>
+
+    <p>
+        <span>Number of Drawers:</span>
+        <span>@numOfDrawers</span>
+    </p>
+
+    <p>
+        <span>Material:</span>
+        <span>@material</span>
+    </p>
+
+    <input type="hidden" name="quoteid" value="@quoteId" />
+    <p><input type="submit" id="deleteButton" name="buttonDelete" value="Delete Quote" /></p>
+
+</form>
+<br>
+<p><a href="~/Quotes.cshtml">Back to Quotes</a></p>

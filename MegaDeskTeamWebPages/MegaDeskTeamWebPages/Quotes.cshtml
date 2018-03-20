@@ -1,0 +1,69 @@
+﻿@using WebMatrix.Data;
+
+@{
+    var db = Database.Open("QuotesDatabase");
+    var selectCommand = "SELECT * FROM Quotes";
+    var searchTerm = "";
+
+    if (Request.QueryString["dateSearch"] == "Search")
+    {
+        selectCommand = "SELECT * FROM Quotes WHERE date LIKE @0";
+        searchTerm = "%" + Request.QueryString["searchDate"] + "%";
+    }
+
+    if (Request.QueryString["nameSearch"] == "Search")
+    {
+        selectCommand = "SELECT * FROM Quotes WHERE CustomerName LIKE @0";
+        searchTerm = "%" + Request["searchName"] + "%";
+    }
+
+    var selectedData = db.Query(selectCommand, searchTerm);
+    var grid = new WebGrid(source: selectedData, defaultSort: "Date", rowsPerPage: 5);
+    //grid.SortDirection = SortDirection.Descending;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MegaDesk</title>
+</head>
+<body>
+    <h2>Quotes</h2>
+    <form method="get" id="search">
+        <div>
+            <label for="searchDate">Search by Date:</label>
+            <input type="text" name="searchDate" id="searchDate" value="@if(Request["nameSearch"].IsEmpty()) {@Request.QueryString["searchDate"]}">
+            <input type="Submit" name="dateSearch" value="Search">
+        </div>
+        <span>or</span>
+        <div>
+            <label for="searchName">Search by Name:</label>
+            <input type="text" name="searchName" id="searchName" value="@if(Request["dateSearch"].IsEmpty()) {@Request.QueryString["searchName"]}">
+            <input type="Submit" name="nameSearch" value="Search"><br>
+        </div>
+    </form>
+
+    @grid.GetHtml(
+                                    tableStyle: "grid",
+                                    headerStyle: "head",
+                                    alternatingRowStyle: "alt",
+                                    columns: grid.Columns(
+                                        grid.Column(format: @<a href="~/edit?id=@item.ID">Edit</a>),
+                                                                                                grid.Column("Width", canSort: true),
+                                                                                                grid.Column("Depth", canSort: false),
+                                                                                                grid.Column("NumOfDrawers", canSort: false),
+                                                                                                grid.Column("Material", canSort: false),
+                                                                                                grid.Column("RushOrder", canSort: true),
+                                                                                                grid.Column("CustomerName", canSort: true),
+                                                                                                grid.Column("Date", canSort: true),
+                                                                                                grid.Column("Total", canSort: true),
+                                                                                                grid.Column(format: @<a href="~/delete?id=@item.ID">Delete</a>)
+                                                                                                                                                    )
+                                                                                                                                            )
+
+    <br>
+    <p>
+        <a href="~/add">Add a Quote</a>
+    </p>
+</body>
+</html>

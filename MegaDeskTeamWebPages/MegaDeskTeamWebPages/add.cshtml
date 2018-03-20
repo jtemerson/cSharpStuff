@@ -1,0 +1,109 @@
+﻿@{
+    Validation.RequireField("width", "Width is Required!");
+    Validation.RequireField("depth", "Depth is required!");
+    Validation.RequireField("numOfDrawers", "Number of Drawers is required!");
+    Validation.RequireField("material", "Material is required!");
+    Validation.RequireField("rushOrder", "Rush Order is required!");
+    Validation.RequireField("customerName", "Name is required!");
+    Validation.RequireField("date", "Date is required!");
+    Validation.RequireField("total", "Total is required!");
+
+    var width = 0;
+    var depth = 0;
+    var numOfDrawers = 0;
+    var material = "";
+    var rushOrder = 0;
+    var customerName = "";
+    var date = "";
+    var total = 0;
+
+
+    if (IsPost)
+    {
+        if (!Request.Form["width"].IsInt())
+        {
+            Validation.AddFormError("Width needs to be a number.");
+        }
+
+        if (!Request.Form["depth"].IsInt())
+        {
+            Validation.AddFormError("Depth needs to be a number.");
+        }
+
+        if (!Request.Form["numOfDrawers"].IsInt())
+        {
+            Validation.AddFormError("Depth needs to be a number.");
+        }
+        if (!Request.Form["total"].IsInt())
+        {
+            Validation.AddFormError("Total needs to be a number.");
+        }
+
+        if (Validation.IsValid())
+        {
+            width = Request.Form["width"].AsInt();
+            depth = Request.Form["depth"].AsInt();
+            numOfDrawers = Request.Form["numOfDrawers"].AsInt();
+            material = Request.Form["material"];
+            rushOrder = Request.Form["rushOrder"].AsInt();
+            customerName = Request.Form["customerName"];
+            date = Request.Form["date"];
+            total = Request.Form["total"].AsInt();
+
+            var db = Database.Open("QuotesDatabase");
+            var insertCommand = "INSERT INTO Quotes (width, depth, numOfDrawers, material, rushOrder, customerName, date, total) VALUES(@0, @1, @2, @3, @4, @5, @6, @7)";
+            db.Execute(insertCommand, width, depth, numOfDrawers, material, rushOrder, customerName, date, total);
+
+            Response.Redirect("~/Quotes");
+        }
+    }
+}
+<h2>Add a Quote</h2>
+@Html.ValidationSummary()
+<form method="post">
+    <p>
+        <label for="width">Width:</label>
+        <input type="text" name="width" id="width" value="@Request.Form["width"]" />
+    </p>
+
+    <p>
+        <label for="depth">Depth:</label>
+        <input type="text" name="depth" id="depth" value="@Request.Form["depth"]" />
+    </p>
+
+    <p>
+        <label for="numOfDrawers">Number of Drawers:</label>
+        <input type="text" name="numOfDrawers" id="numOfDrawers" value="@Request.Form["numOfDrawers"]" />
+    </p>
+
+    <p>
+        <label for="material">Material:</label>
+        <textarea rows="3" cols="28" id="material" name="material">@Request.Form["material"]</textarea>
+    </p>
+
+    <p>
+        <label for="rushOrder">Rush Order:</label>
+        <textarea rows="3" cols="28" id="rushOrder" name="rushOrder">@Request.Form["rushOrder"]</textarea>
+    </p>
+
+    <p>
+        <label for="customerName">Customer Name:</label>
+        <textarea rows="3" cols="28" id="customerName" name="customerName">@Request.Form["customerName"]</textarea>
+    </p>
+
+    <p>
+        <label for="date">Date:</label>
+        <textarea rows="3" cols="28" id="date" name="date">@Request.Form["date"]</textarea>
+    </p>
+
+    <p>
+        <label for="total">Total:</label>
+        <textarea rows="3" cols="28" id="total" name="total">@Request.Form["total"]</textarea>
+    </p>
+
+    <p><input type="submit" name="buttonSubmit" value="Get Quote" /></p>
+</form>
+
+<p>
+    <a href="~/Quotes.cshtml">Back to Quotes</a>
+</p>
