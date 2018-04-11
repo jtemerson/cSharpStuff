@@ -20,9 +20,34 @@ namespace SacramentMeetingPlanner.Controllers
         }
 
         // GET: SacramentMeetingPlans
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
+
         {
-            return View(await _context.sacramentMeetingPlans.ToListAsync());
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["CurrentFilter"] = searchString;
+
+            var sacramentPlan = from s in _context.sacramentMeetingPlans
+                                select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                sacramentPlan = sacramentPlan.Where(s => s.Topic.Contains(searchString));
+
+            }
+
+            switch (sortOrder)
+            {
+                case "Date":
+                    sacramentPlan = sacramentPlan.OrderBy(s => s.Date);
+                    break;
+                case "date_desc":
+                    sacramentPlan = sacramentPlan.OrderByDescending(s => s.Date);
+                    break;
+                default:
+                    sacramentPlan = sacramentPlan.OrderBy(s => s.SacramentMeetingPlanID);
+                    break;
+            }
+            return View(await sacramentPlan.AsNoTracking().ToListAsync());
         }
 
         // GET: SacramentMeetingPlans/Details/5

@@ -3,22 +3,39 @@
 @{
     ViewData["Title"] = "Sacrament Meeting Planner";
 }
+<style>
+    a{
+        color: midnightblue;
+    }
+</style>
 
 <h2>Sacrament Meeting Plans</h2>
-
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Search By Topic: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create"><button class="btn btn-primary">Create New</button></a>
 </p>
-<table class="table">
+
+<table class="table table-hover table-striped">
     <thead>
         <tr>
-                <th>
+            <th>
+                <h2><a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]">@Html.DisplayNameFor(model => model.Date)</a></h2>
+            </th>
+            @*<th>
                     <h1><strong>@Html.DisplayNameFor(model => model.Date)</strong></h1>
-                </th>
-                @*<th>
+                </th>*@
+            @*<th>
                     @Html.DisplayNameFor(model => model.OpeningPrayer)
                 </th>*@
-                @*<th>
+            @*<th>
                     @Html.DisplayNameFor(model => model.ClosingPrayer)
                 </th>
                 <th>
@@ -55,53 +72,54 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.SacramentMeetingPlanID">@Html.DisplayFor(modelItem => item.Date) Sacrament Meeting Plan Details</a>
-</td>
-            @*<td>
-                @Html.DisplayFor(modelItem => item.OpeningPrayer)
-            </td>*@
-            @*<td>
-                @Html.DisplayFor(modelItem => item.ClosingPrayer)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OpeningHymn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SacramentHymn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ClosingHymn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Talk1)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Talk2)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Talk3)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Topic)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LeaderName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Presiding)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Announcements)
-            </td>*@
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SacramentMeetingPlanID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SacramentMeetingPlanID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SacramentMeetingPlanID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.SacramentMeetingPlanID">@Html.DisplayFor(modelItem => item.Date) Sacrament Meeting Plan Details</a>
+                </td>
+                @*<td>
+                        @Html.DisplayFor(modelItem => item.OpeningPrayer)
+                    </td>*@
+                @*<td>
+                        @Html.DisplayFor(modelItem => item.ClosingPrayer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OpeningHymn)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SacramentHymn)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ClosingHymn)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Talk1)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Talk2)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Talk3)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Topic)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LeaderName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Presiding)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Announcements)
+                    </td>*@
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.SacramentMeetingPlanID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.SacramentMeetingPlanID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.SacramentMeetingPlanID">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
